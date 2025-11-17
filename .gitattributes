@@ -1,4 +1,6 @@
 * text=lf
 * eol=lf
 
+*.pdf binary
+
 *.ghci linguist-language=Haskell
