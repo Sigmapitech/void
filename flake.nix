@@ -7,8 +7,12 @@
     };
   };
 
-  outputs = { self, nixpkgs, git-hooks }: let
-    applySystems = nixpkgs.lib.genAttrs [ "x86_64-linux" ];
+  outputs = {
+    self,
+    nixpkgs,
+    git-hooks,
+  }: let
+    applySystems = nixpkgs.lib.genAttrs ["x86_64-linux"];
     eachSystem = f: applySystems (system: f nixpkgs.legacyPackages.${system});
 
     inherit (nixpkgs) lib;
@@ -22,23 +26,27 @@
             "cabal-fmt"
             "ormolu"
             "hlint"
-          ] (x: { enable = true; });
+          ] (x: {enable = true;});
         };
       }
     );
+
+    formatter = eachSystem (pkgs: pkgs.alejandra);
 
     devShells = eachSystem (pkgs: let
       haskell = pkgs.haskell.packages.ghc984;
     in {
       default = pkgs.mkShell {
-        packages = with pkgs; [
-          chez
-        ] ++ (with haskell; [
-          ghc
-          cabal-install
-          hlint
-          ormolu
-        ]);
+        packages = with pkgs;
+          [
+            chez
+          ]
+          ++ (with haskell; [
+            ghc
+            cabal-install
+            hlint
+            ormolu
+          ]);
       };
     });
   };
