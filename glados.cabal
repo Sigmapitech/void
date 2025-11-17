@@ -36,3 +36,16 @@ executable lisp-interpreter
   build-depends:
     , base
     , glados:lisp-interpreter-lib
+
+test-suite lisp-interpreter-test
+  import:         lang
+  import:         warnings
+  type:           exitcode-stdio-1.0
+  main-is:        LispSpec.hs
+  hs-source-dirs: tests
+  build-depends:
+    , base                         >=4.7 && <5
+    , directory
+    , glados:lisp-interpreter-lib
+    , hspec
+    , hspec-expectations
