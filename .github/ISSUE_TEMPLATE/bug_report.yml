@@ -1,0 +1,77 @@
+name: "Bug Report"
+description: "Report something that isn't working as expected"
+labels: ["0.kind: bug"]
+body:
+  - type: "markdown"
+    attributes:
+      value: |
+        # Bug Report
+
+        Please fill out each section below to help us understand and reproduce the issue.
+  - type: "textarea"
+    id: "description"
+    attributes:
+      label: "Describe the bug"
+      description: "A clear and concise description of what the bug is."
+    validations:
+      required: true
+  - type: "textarea"
+    id: "reproduction_steps"
+    attributes:
+      label: "Steps to reproduce"
+      description: "Please include a step-by-step guide for reproducing this issue. Use numbered bullet points."
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Observe '...'
+    validations:
+      required: true
+  - type: "textarea"
+    id: "expected_behavior"
+    attributes:
+      label: "Expected behavior"
+      description: "What did you expect to happen?"
+    validations:
+      required: true
+  - type: "textarea"
+    id: "actual_behavior"
+    attributes:
+      label: "Actual behavior"
+      description: "What actually happened?"
+    validations:
+      required: true
+  - type: "textarea"
+    id: "screenshots"
+    attributes:
+      label: "Screenshots / Logs"
+      description: "If applicable, add screenshots or log outputs to help explain your problem."
+    validations:
+      required: false
+  - type: "input"
+    id: "os"
+    attributes:
+      label: "Operating System"
+      placeholder: "e.g., Ubuntu 22.04, macOS 14.0, Windows 11"
+    validations:
+      required: true
+  - type: "input"
+    id: "browser_platform"
+    attributes:
+      label: "Browser / Platform"
+      placeholder: "e.g., Chrome 120, Firefox 121, Node.js 20.x"
+    validations:
+      required: false
+  - type: "input"
+    id: "version"
+    attributes:
+      label: "App Version / Commit"
+      placeholder: "e.g., v1.2.3, commit abc123"
+    validations:
+      required: false
+  - type: "textarea"
+    id: "additional_context"
+    attributes:
+      label: "Additional context"
+      description: "Add any other context about the problem here."
+    validations:
+      required: false
