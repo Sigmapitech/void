@@ -1,0 +1,53 @@
+name: "Feature Request"
+description: "Suggest a new idea for this project"
+labels: ["enhancement"]
+body:
+  - type: "markdown"
+    attributes:
+      value: |
+        # Feature Request
+
+        Help us understand your feature request by filling out the sections below.
+  - type: "textarea"
+    id: "summary"
+    attributes:
+      label: "Summary"
+      description: "Describe the feature in one or two sentences."
+    validations:
+      required: true
+  - type: "textarea"
+    id: "problem"
+    attributes:
+      label: "Problem or Use Case"
+      description: "What problem does this feature solve? Who would benefit from it?"
+    validations:
+      required: true
+  - type: "textarea"
+    id: "solution"
+    attributes:
+      label: "Proposed Solution"
+      description: "How would you like it to work? Describe the behavior or implementation."
+    validations:
+      required: true
+  - type: "textarea"
+    id: "alternatives"
+    attributes:
+      label: "Alternatives Considered"
+      description: "Have you thought of other ways to achieve this?"
+    validations:
+      required: false
+  - type: "input"
+    id: "dependencies"
+    attributes:
+      label: "Dependencies / Related Issues"
+      description: "List related or blocking issues (e.g., #123, #456)."
+      placeholder: "Blocks #123, Related to #456"
+    validations:
+      required: false
+  - type: "textarea"
+    id: "mockups"
+    attributes:
+      label: "Mockups / References"
+      description: "Attach screenshots, sketches, or links to similar ideas."
+    validations:
+      required: false

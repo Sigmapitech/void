@@ -1,0 +1,46 @@
+name: "Addon: Priority / Impact"
+description: "Add-on: Priority and impact assessment"
+body:
+  - type: "markdown"
+    attributes:
+      value: |
+        # Priority / Impact Add-on
+
+        Use this to help with triage and prioritization.
+  - type: "dropdown"
+    id: "priority"
+    attributes:
+      label: "Priority"
+      description: "How urgent is this issue?"
+      options:
+        - "Unspecified"
+        - "Lowest"
+        - "Low"
+        - "Moderate"
+        - "High"
+        - "Critical"
+      default: 0
+    validations:
+      required: false
+  - type: "dropdown"
+    id: "impact"
+    attributes:
+      label: "Impact"
+      description: "What kind of impact does this have?"
+      options:
+        - "Unspecified"
+        - "Minor annoyance"
+        - "Blocks workflow"
+        - "Blocks release"
+        - "Security concern"
+        - "Performance issue"
+      default: 0
+    validations:
+      required: false
+  - type: "textarea"
+    id: "impact_notes"
+    attributes:
+      label: "Impact details"
+      description: "Explain the priority and impact assessment."
+    validations:
+      required: false

@@ -1,0 +1,35 @@
+name: "Addon: From Discussion"
+description: "Add-on: Link to originating GitHub Discussion"
+body:
+  - type: "markdown"
+    attributes:
+      value: |
+        # From GitHub Discussion Add-on
+
+        Use this to convert a discussion into an actionable issue.
+  - type: "input"
+    id: "discussion_link"
+    attributes:
+      label: "Discussion URL"
+      description: "Link to the originating GitHub Discussion."
+      placeholder: "https://github.com/OWNER/REPO/discussions/123"
+    validations:
+      required: true
+  - type: "textarea"
+    id: "discussion_summary"
+    attributes:
+      label: "Summary of Discussion"
+      description: "Paste a short summary of the consensus or key points."
+    validations:
+      required: true
+  - type: "checkboxes"
+    id: "action_items"
+    attributes:
+      label: "Action Items from Discussion"
+      options:
+        - label: "Action item 1"
+          required: false
+        - label: "Action item 2"
+          required: false
+        - label: "Action item 3"
+          required: false
