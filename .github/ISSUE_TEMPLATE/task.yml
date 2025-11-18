@@ -1,6 +1,6 @@
 name: "Task"
 description: "Describe a task or implementation detail"
-labels: ["task"]
+labels: ["3.type: task"]
 body:
   - type: "markdown"
     attributes:

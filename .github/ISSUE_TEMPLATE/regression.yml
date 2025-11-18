@@ -1,6 +1,6 @@
 name: " Regression"
 description: "Report something that used to work but no longer does"
-labels: ["regression"]
+labels: ["3.type: regression"]
 body:
   - type: "markdown"
     attributes:

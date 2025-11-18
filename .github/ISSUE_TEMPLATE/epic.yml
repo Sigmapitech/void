@@ -1,6 +1,6 @@
 name: "Epic"
 description: "Large, multi-part goal tracking multiple sub-issues"
-labels: ["epic"]
+labels: ["3.type: epic"]
 body:
   - type: "markdown"
     attributes:

@@ -1,6 +1,6 @@
 name: "Sub-Issue"
 description: "Track a smaller part of a larger issue or epic"
-labels: ["sub-issue"]
+labels: ["3.type: task"]
 body:
   - type: "markdown"
     attributes:
