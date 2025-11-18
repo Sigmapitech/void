@@ -1,0 +1,41 @@
+name: "Addon: Relationship / References"
+description: "Add-on: Track related, blocking, and blocked issues"
+body:
+  - type: "markdown"
+    attributes:
+      value: |
+        # Relationship / References Add-on
+
+        Use this to explicitly relate issues and track dependencies.
+  - type: "input"
+    id: "related"
+    attributes:
+      label: "Related to"
+      description: "Issues that are related but not blocking."
+      placeholder: "#123, #456"
+    validations:
+      required: false
+  - type: "input"
+    id: "blocks"
+    attributes:
+      label: "Blocks"
+      description: "Issues that are blocked by this one."
+      placeholder: "#789"
+    validations:
+      required: false
+  - type: "input"
+    id: "blocked_by"
+    attributes:
+      label: "Blocked by"
+      description: "Issues that must be resolved before this one."
+      placeholder: "#101"
+    validations:
+      required: false
+  - type: "input"
+    id: "duplicate_of"
+    attributes:
+      label: "Duplicate of"
+      description: "If this is a duplicate, link to the original issue."
+      placeholder: "#202"
+    validations:
+      required: false

@@ -1,0 +1,32 @@
+name: "Addon: Link PR / Issue"
+description: "Add-on: Cross-reference PRs and issues"
+body:
+  - type: "markdown"
+    attributes:
+      value: |
+        # Link PR / Issue Add-on
+
+        Use this to maintain explicit links between issues and pull requests.
+  - type: "input"
+    id: "pr_links"
+    attributes:
+      label: "Link to PR(s)"
+      description: "Paste PR URLs or numbers."
+      placeholder: "#123, https://github.com/OWNER/REPO/pull/456"
+    validations:
+      required: false
+  - type: "input"
+    id: "issue_links"
+    attributes:
+      label: "Link to Issue(s)"
+      description: "Paste issue URLs or numbers."
+      placeholder: "#789, https://github.com/OWNER/REPO/issues/101"
+    validations:
+      required: false
+  - type: "textarea"
+    id: "link_notes"
+    attributes:
+      label: "Notes"
+      description: "Remember to use 'Closes #NNN' or 'Related to #NNN' in PR descriptions."
+    validations:
+      required: false
