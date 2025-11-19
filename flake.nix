@@ -68,6 +68,7 @@
           [
             chez
             curl
+            jq
           ]
           ++ self.checks.${pkgs.system}.pre-commit-check.enabledPackages
           ++ (with haskell; [
