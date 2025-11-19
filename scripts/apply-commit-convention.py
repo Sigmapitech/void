@@ -17,7 +17,8 @@ def has_correct_message(msg: str) -> bool:
         return False
 
     scope, sentence = title.split(":")
-    if not all(c.isalpha() and c.islower() for c in scope):
+    # Allow `[a-z]`, `-` and `/` characters
+    if not all((c.isalpha() and c.islower()) or c in '-/' for c in scope):
         print("scope must be a single lowercase word.")
         return False
 
