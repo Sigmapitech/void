@@ -35,7 +35,7 @@ executable lisp-interpreter
   hs-source-dirs: src
   build-depends:
     , base
-    , glados:lisp-interpreter-lib
+    , lisp:lisp-interpreter-lib
 
 test-suite lisp-interpreter-test
   import:         lang
@@ -44,8 +44,8 @@ test-suite lisp-interpreter-test
   main-is:        LispSpec.hs
   hs-source-dirs: tests
   build-depends:
-    , base                         >=4.7 && <5
+    , base                       >=4.7 && <5
     , directory
-    , glados:lisp-interpreter-lib
     , hspec
     , hspec-expectations
+    , lisp:lisp-interpreter-lib
