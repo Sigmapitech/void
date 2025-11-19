@@ -75,10 +75,13 @@
             cabal-install
 
             (ghcWithPackages (p: [
+              Cabal
+              Cabal-syntax
               hspec
               hspec-expectations
-              parsec
               megaparsec
+              parsec
+              regex-tdfa
               silently
             ]))
           ]);
