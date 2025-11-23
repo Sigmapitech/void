@@ -17,6 +17,19 @@ body:
       placeholder: "As a team, we need to deliver the VM..."
     validations:
       required: true
+
+  - type: dropdown
+    id: part
+    attributes:
+      label: Project Part
+      description: Which part of the project does this belong to?
+      options:
+        - "8. part: 0-infrastructure"
+        - "8. part: 1-lisp-interpreter"
+        - "8. part: 2-custom-language"
+    validations:
+      required: true
+
   - type: input
     id: parent_initiative
     attributes:
