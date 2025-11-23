@@ -77,3 +77,32 @@ body:
         - "3. type: test"
     validations:
       required: true
+
+  - type: textarea
+    id: test_strategy
+    attributes:
+      label: Test Strategy
+      description: How will you test this?
+      placeholder: |
+        - Unit tests: Test parsing valid lambda expressions
+        - Edge cases: Empty parameter list, single parameter, multiple parameters
+        - Integration: Test lambda within larger expressions
+
+  - type: textarea
+    id: relationships
+    attributes:
+      label: Relationships
+      description: Dependencies and blocking relationships.
+      value: |
+        **Blocked by:**
+        - [] #
+
+        **Blocking:**
+        - [] #
+
+  - type: input
+    id: assignee_suggestion
+    attributes:
+      label: Suggested Assignee
+      description: Who should work on this? (Optional)
+      placeholder: "@username"
