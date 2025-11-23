@@ -67,8 +67,26 @@ body:
         - "2. priority: low"
     validations:
       required: true
+
   - type: textarea
+    id: technical_notes
     attributes:
+      label: Technical Notes
+      description: Any technical considerations or constraints
+      placeholder: |
+        - Must handle recursive calls without stack overflow
+        - Consider tail-call optimization
+        - Need to maintain closure environments
+
+  - type: textarea
+    id: child_tasks
+    attributes:
+      label: Child Tasks
+      description: Specific implementation tasks (will be created as separate issues)
+      value: |
+        - [ ] #
+        - [ ] #
+
   - type: textarea
     id: relationships
     attributes:
@@ -80,3 +98,10 @@ body:
 
         **Blocking:**
         - [] #
+
+  - type: input
+    id: sprint
+    attributes:
+      label: Target Sprint
+      description: Target sprint or date for this Story
+      placeholder: "Sprint 2"
