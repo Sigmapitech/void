@@ -1,5 +1,5 @@
 name: "🟢 Story (Layer 1)"
-description: "A specific feature requirement (Roadmap Item)."
+description: "A specific feature requirement or user-facing capability (Roadmap Item)."
 title: "[STORY] "
 labels: ["0. layer: story"]
 body:
@@ -7,38 +7,55 @@ body:
     attributes:
       value: |
         ## User Story
-        "As a [role], I want [feature], so that [benefit]."
+        Describe a feature from the user's perspective: **"As a [role], I want [feature], so that [benefit]."**
+
   - type: textarea
-    id: description
+    id: user_story
     attributes:
-      label: Definition
-      placeholder: "As a developer, I want the parser to handle lists..."
+      label: User Story
+      placeholder: |
+        As a developer using GlaDOS,
+        I want the parser to handle lists
+        So that I can work with list data structures easily.
     validations:
       required: true
+
+# Commented out because feel useless.
+# Not removed because Epi might like it.
+  # - type: textarea
+  #   id: acceptance_criteria
+  #   attributes:
+  #     label: Definition of Done (Acceptance Criteria)
+  #     description: What must be true for this Story to be complete?
+  #     value: |
+  #       - [ ] Functional implementation complete
+  #       - [ ] Unit tests written and passing
+  #       - [ ] Integration tests added
+  #       - [ ] Documentation updated (user manual + code comments)
+  #       - [ ] No regressions in existing functionality
+  #   validations:
+  #     required: true
+
   - type: input
     id: parent_epic
     attributes:
-      label: 🔗 Parent Epic
-      description: Link the Epic this story belongs to.
+      label: Parent Epic
+      description: Link the Epic this Story belongs to
       placeholder: "#12"
-  - type: input
-    id: relationships
-    attributes:
-      label: 🔄 Relationships (Optional)
-      description: Blocked by / Blocking relationships (e.g., #123, #456).
-      value: |
-        - [] # (blocked by)
-        - [] # (blocking)
     validations:
-      required: false
+      required: true
+
   - type: dropdown
     id: difficulty
     attributes:
       label: Estimated Difficulty
       options:
-        - "1. difficulty : easy"
-        - "1. difficulty : medium"
-        - "1. difficulty : hard"
+        - "1. difficulty: easy"
+        - "1. difficulty: medium"
+        - "1. difficulty: hard"
+    validations:
+      required: true
+
   - type: dropdown
     id: priority
     attributes:
@@ -51,11 +68,15 @@ body:
     validations:
       required: true
   - type: textarea
-    id: acceptance_criteria
     attributes:
-      label: ✅ Definition of Done (Acceptance Criteria)
-      description: What must be true for this to be closed?
+  - type: textarea
+    id: relationships
+    attributes:
+      label: Relationships
+      description: Dependencies and blocking relationships.
       value: |
-        - [ ] Unit Tests written and passing
-        - [ ] Functional implementation complete
-        - [ ] Documentation updated
+        **Blocked by:**
+        - [] #
+
+        **Blocking:**
+        - [] #
