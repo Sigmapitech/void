@@ -1,0 +1,78 @@
+name: "🟣 Epic (Layer 0)"
+description: "High-level feature grouping or roadmap milestone."
+title: "[EPIC] "
+labels: ["0. layer: epic", "5. scope: tracking"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Epic Overview
+        An Epic groups multiple Stories under a common goal (e.g., "Implement Part 2 Compiler").
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is the high-level goal of this Epic?
+      placeholder: "As a team, we need to deliver the VM..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: part
+    attributes:
+      label: Project Part
+      description: Which part of the project does this belong to?
+      options:
+        - "8. part: 0-infrastructure"
+        - "8. part: 1-lisp-interpreter"
+        - "8. part: 2-custom-language"
+    validations:
+      required: true
+
+  - type: input
+    id: parent_initiative
+    attributes:
+      label: 🔗 Parent Initiative (Milestone) (Optional)
+      description: Link to GitHub Milestone if applicable
+      placeholder: "GLADOS-Part-2"
+
+# Commented out because feel useless.
+# Not removed because Epi might like it.
+  # - type: textarea
+  #   id: success_criteria
+  #   attributes:
+  #     label: Success Criteria
+  #     description: What must be achieved for this Epic to be complete?
+  #     placeholder: |
+  #       - [ ] All child stories completed
+  #       - [ ] Integration tests passing
+  #       - [ ] Documentation written
+
+  - type: textarea
+    id: child_stories
+    attributes:
+      label: Child Stories
+      description: List the Stories (Layer 1) that belong to this Epic. (will be updated as stories are created)
+      value: |
+        - [ ] #
+        - [ ] #
+
+  - type: textarea
+    id: relationships
+    attributes:
+      label: Relationships
+      description: Dependencies and blocking relationships.
+      value: |
+        **Blocked by:**
+        - [ ] #
+
+        **Blocking:**
+        - [ ] #
+
+  - type: input
+    id: timeline
+    attributes:
+      label: Timeline
+      description: Target sprint or date
+      placeholder: "Sprint 1 - Ideation: Nov 17 - Nov 23"

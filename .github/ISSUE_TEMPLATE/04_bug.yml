@@ -1,0 +1,131 @@
+name: "🐛 Bug Report"
+description: "Report broken functionality or unexpected behavior"
+title: "[BUG] "
+labels: ["3. type: bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+        Please provide detailed information to help us identify and fix the issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Clear and concise description of what the bug is
+      placeholder: "When parsing nested lambda expressions, the parser fails with a 'unexpected token' error"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: What should happen?
+      placeholder: "The parser should correctly handle nested lambda expressions and produce a valid AST"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happens?
+      placeholder: "Parser crashes with error: 'Parse error at line 2, column 5'"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the bug
+      placeholder: |
+        1. Create a file `test.glados` with the following content: ...
+        2. Run `glados test.glados`
+        3. Observe the error
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction_code
+    attributes:
+      label: Minimal Reproduction Code
+      description: The smallest code snippet that demonstrates the bug
+      placeholder: |
+        ((lambda (x) (lambda (y) (+ x y))) 5)
+      render: scheme
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Stack Trace / Error Output
+      description: Complete error messages, stack traces, or logs
+      render: shell
+      placeholder: |
+        *** ERROR: Parse error at line 1, column 23
+        Expected: closing parenthesis
+        Got: lambda
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Your system details
+      placeholder: "NixOS 23.11, GHC 9.6.3, Stack 2.13.1"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - "7. component: parser"
+        - "7. component: vm"
+        - "7. component: compiler"
+        - "7. component: stdlib"
+        - "7. component: tests"
+        - "7. component: ci/cd"
+        - "7. component: nix"
+        - "7. component: documentation"
+        - "7. component: dep manager"
+        - "7. component: uncategorized"
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - "4. severity: blocker"
+        - "4. severity: security"
+        - "4. severity: regular"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bug_type
+    attributes:
+      label: Bug Type
+      options:
+        - "3. type: bug"
+        - "3. type: regression"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other information that might help (screenshots, related issues, etc.)
+      placeholder: "This might be related to #123"
