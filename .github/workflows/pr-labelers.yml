@@ -54,48 +54,6 @@ jobs:
             console.log('=== Current labels ===');
             console.log(currentLabels);
 
-            // 1a. Merge conflict detection
-            const isMergeable = pr.mergeable;
-            const mergeConflictLabel = '5. status: merge conflict';
-
-            if (isMergeable === false) {
-              if (!currentLabels.includes(mergeConflictLabel)) {
-                labelsToAdd.add(mergeConflictLabel);
-              }
-            } else if (isMergeable === true) {
-              if (currentLabels.includes(mergeConflictLabel)) {
-                labelsToRemove.add(mergeConflictLabel);
-              }
-            }
-
-            // 1b. Blocked status - check PR body for blocking references
-            const blockedLabel = '5. status: blocked';
-            const prBody = pr.body || '';
-            const blockingPatterns = [
-              /[Bb]locked?\s+[Bb]y[:\s]+#(\d+)/g,
-              /[Dd]epends?\s+[Oo]n[:\s]+#(\d+)/g,
-              /[Ww]aiting?\s+(?:[Oo]n|[Ff]or)[:\s]+#(\d+)/g,
-              /[Rr]equires?[:\s]+#(\d+)/g
-            ];
-
-            let hasBlockingRefs = false;
-            for (const pattern of blockingPatterns) {
-              if (pattern.test(prBody)) {
-                hasBlockingRefs = true;
-                break;
-              }
-            }
-
-            if (hasBlockingRefs) {
-              if (!currentLabels.includes(blockedLabel)) {
-                labelsToAdd.add(blockedLabel);
-              }
-            } else {
-              if (currentLabels.includes(blockedLabel)) {
-                labelsToRemove.add(blockedLabel);
-              }
-            }
-
             const componentLabels = currentLabels.filter(l => l.startsWith('7. component:'));
             const uncategorizedLabel = '7. component: uncategorized';
 
