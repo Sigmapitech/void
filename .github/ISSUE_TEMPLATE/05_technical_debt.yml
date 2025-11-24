@@ -1,0 +1,60 @@
+name: "⚠️ Technical Debt"
+description: "Code quality issues, refactoring needs, or maintenance work"
+title: "[DEBT] "
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What technical debt exists?
+      placeholder: "The Parser module has grown to 1000+ lines and mixes concerns. It needs to be split into smaller, focused modules."
+    validations:
+      required: true
+
+  - type: textarea
+    id: why_debt
+    attributes:
+      label: Why This Is Debt
+      description: Why does this need to be addressed?
+      placeholder: |
+        - Hard to test individual parsing functions
+        - New contributors get confused by file size
+        - Violates single responsibility principle
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: How should this be resolved?
+      placeholder: |
+        Split Parser.hs into:
+        - Parser/Atoms.hs
+        - Parser/Lists.hs
+        - Parser/SpecialForms.hs
+        - Parser/Core.hs
+
+  - type: dropdown
+    id: debt_type
+    attributes:
+      label: Type
+      options:
+        - "3. type: refactor"
+        - "3. type: cleanup"
+        - "3. type: documentation"
+        - "3. type: test"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - "2. priority: critical"
+        - "2. priority: high"
+        - "2. priority: medium"
+        - "2. priority: low"
+    validations:
+      required: true
