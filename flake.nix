@@ -77,10 +77,13 @@
             (ghcWithPackages (p: [
               Cabal
               Cabal-syntax
+              bytestring
+              containers
               hspec
               hspec-expectations
               megaparsec
               parsec
+              pretty-simple
               regex-tdfa
               silently
             ]))
