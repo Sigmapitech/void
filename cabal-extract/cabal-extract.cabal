@@ -27,6 +27,7 @@ executable cabal-extract
   main-is:        Main.hs
   hs-source-dirs: .
   build-depends:
+    , aeson
     , base           >=4.7 && <5
     , bytestring
     , Cabal

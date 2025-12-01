@@ -1,7 +1,11 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main (main) where
 
-import Control.Monad (forM_)
+import Data.Aeson
+import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.List (intercalate)
+import Data.Maybe (fromMaybe)
 import qualified Data.Set as Set
 import qualified Distribution.Compat.NonEmptySet as NES
 import Distribution.PackageDescription.Configuration (flattenPackageDescription)
@@ -31,7 +35,6 @@ import System.FilePath
     takeFileName,
     (</>),
   )
-import Text.Pretty.Simple (pPrint)
 import Text.Regex.TDFA ((=~))
 
 data Component = Component
@@ -50,6 +53,25 @@ data Package = Package
     packageBenchmarks :: [Component]
   }
   deriving (Show)
+
+instance ToJSON Component where
+  toJSON comp =
+    object
+      [ "name" .= componentName comp,
+        "dependencies" .= map depToString (componentDependencies comp),
+        "reverseDependencies" .= componentReverseDependencies comp
+      ]
+
+instance ToJSON Package where
+  toJSON pkg =
+    object
+      [ "name" .= packageName pkg,
+        "version" .= packageVersion pkg,
+        "libraries" .= packageLibraries pkg,
+        "executables" .= packageExecutables pkg,
+        "tests" .= packageTests pkg,
+        "benchmarks" .= packageBenchmarks pkg
+      ]
 
 classify :: String -> String -> FilePath -> IO [FilePath]
 classify rejectedNamePattern allowedNamePattern path = do
@@ -178,6 +200,56 @@ trim pkg comps =
           packageBenchmarks = map trimC (packageBenchmarks pkg)
         }
 
+buildReverseDependencies :: [Package] -> [Package]
+buildReverseDependencies pkgs =
+  let compDepMap =
+        foldr
+          ( \pkg acc ->
+              foldr
+                ( \comp acc' ->
+                    let compKey = case componentName comp of
+                          "library" -> packageName pkg
+                          name -> packageName pkg ++ ":" ++ name
+                     in foldr
+                          ( \dep acc'' ->
+                              let depKey = depToString dep
+                               in if depKey `elem` map fst acc''
+                                    then
+                                      map
+                                        ( \entry ->
+                                            if fst entry == depKey
+                                              then (fst entry, snd entry ++ [compKey])
+                                              else entry
+                                        )
+                                        acc''
+                                    else (depKey, [compKey]) : acc''
+                          )
+                          acc'
+                          (componentDependencies comp)
+                )
+                acc
+                (allComponents pkg)
+          )
+          []
+          pkgs
+      compDepMapLookup key = fromMaybe [] (lookup key compDepMap)
+      addReverseDeps pkg =
+        let addRevDepToComp comp =
+              comp
+                { componentReverseDependencies =
+                    compDepMapLookup $
+                      case componentName comp of
+                        "library" -> packageName pkg
+                        name -> packageName pkg ++ ":" ++ name
+                }
+         in pkg
+              { packageLibraries = map addRevDepToComp (packageLibraries pkg),
+                packageExecutables = map addRevDepToComp (packageExecutables pkg),
+                packageTests = map addRevDepToComp (packageTests pkg),
+                packageBenchmarks = map addRevDepToComp (packageBenchmarks pkg)
+              }
+   in map addReverseDeps pkgs
+
 main :: IO ()
 main =
   getCurrentDirectory >>= findCabalFiles >>= \cabalFiles -> do
@@ -185,4 +257,5 @@ main =
     let fpds = map flattenPackageDescription gpds
         pkgs = map convertPackage fpds
         trimmedPkgs = map (`trim` innerComponent pkgs) pkgs
-    mapM_ pPrint trimmedPkgs
+        finalPkgs = buildReverseDependencies trimmedPkgs
+    BL.putStrLn (encode finalPkgs)
