@@ -18,10 +18,9 @@ import Text.Megaparsec
 import Text.Megaparsec.Char (alphaNumChar, letterChar, space1)
 import qualified Text.Megaparsec.Char.Lexer as L
 
--- 1. Custom Error Component (The "Own Error Handling" part)
--- You can define specific error cases that ParseErrorBundle doesn't cover by default.
+-- Custom error
 data GladosError
-  = IllegalNumber Integer -- Example: We don't like number 0
+  = IllegalNumber Integer
   | CustomError String
   deriving (Show, Eq, Ord)
 
@@ -32,14 +31,14 @@ instance ShowErrorComponent GladosError where
 -- The Parser type uses Void for standard text, or GladosError for custom logic
 type Parser = Parsec GladosError String
 
--- 2. AST
+-- AST
 data SExpr
   = AtomInt Integer
   | AtomSym String
   | List [SExpr]
   deriving (Show, Eq)
 
--- 3. Lexer
+-- Lexer
 sc :: Parser ()
 sc = L.space space1 (L.skipLineComment ";") empty
 
@@ -61,7 +60,7 @@ identifier = lexeme $ do
   rest <- many (alphaNumChar <|> oneOf "!$%&|*+-/:<=>?@^_~")
   return (first : rest)
 
--- 4. Parser Logic
+-- Parser Logic
 parseAtom :: Parser SExpr
 parseAtom = try (integer >>= checkInt) <|> AtomSym <$> identifier
   where
@@ -78,11 +77,10 @@ parseExpr = parseAtom <|> parseList
 parseLisp :: Parser [SExpr]
 parseLisp = sc >> many parseExpr <* eof
 
--- 5. Entry Point & Fancy Error Display
+-- Runner
 parseString :: String -> IO [SExpr]
 parseString input = case runParser parseLisp "source_file" input of
   Left bundle -> do
-    -- errorBundlePretty gives very nice, annotated errors (like Rust/Clang)
     hPutStrLn stderr (errorBundlePretty bundle)
     exitWith (ExitFailure 84)
   Right ast -> return ast
