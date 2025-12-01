@@ -41,7 +41,7 @@ import Text.Regex.TDFA ((=~))
 
 data ComputedComponent = ComputedComponent
   { componentName :: String,
-    componentDependencies :: [Dependency],
+    componentDependencies :: [String],
     componentReverseDependencies :: [String]
   }
   deriving (Show)
@@ -60,7 +60,7 @@ instance ToJSON ComputedComponent where
   toJSON comp =
     object
       [ "name" .= componentName comp,
-        "dependencies" .= map depToString (componentDependencies comp),
+        "dependencies" .= componentDependencies comp,
         "reverseDependencies" .= componentReverseDependencies comp
       ]
 
@@ -117,7 +117,7 @@ computeComponentDeps = dispatcher
     wrap blob nameRetriever dependencyRetriever =
       ComputedComponent
         { componentName = unUnqualComponentName (nameRetriever blob),
-          componentDependencies = targetBuildDepends (dependencyRetriever blob),
+          componentDependencies = map depToString (targetBuildDepends (dependencyRetriever blob)),
           componentReverseDependencies = []
         }
 
@@ -173,7 +173,7 @@ trimComponent allowed comp =
   comp
     { componentDependencies =
         filter
-          (\dep -> depToString dep `Set.member` allowed)
+          (`Set.member` allowed)
           (componentDependencies comp)
     }
 
@@ -200,7 +200,7 @@ buildReverseDependencies pkgs =
                           name -> packageName pkg ++ ":" ++ name
                      in foldr
                           ( \dep acc'' ->
-                              let depKey = depToString dep
+                              let depKey = dep
                                in if depKey `elem` map fst acc''
                                     then
                                       map
