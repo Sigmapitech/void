@@ -8,6 +8,7 @@ import Data.List (intercalate)
 import Data.Maybe (fromMaybe)
 import qualified Data.Set as Set
 import qualified Distribution.Compat.NonEmptySet as NES
+import Distribution.PackageDescription
 import Distribution.PackageDescription.Configuration (flattenPackageDescription)
 import Distribution.Pretty (prettyShow)
 import Distribution.Simple.PackageDescription (readGenericPackageDescription)
@@ -24,7 +25,7 @@ import Distribution.Types.PackageDescription (PackageDescription (..))
 import Distribution.Types.PackageId (pkgName, pkgVersion)
 import Distribution.Types.PackageName (unPackageName)
 import Distribution.Types.TestSuite (TestSuite (..))
-import Distribution.Types.UnqualComponentName (unUnqualComponentName)
+import Distribution.Types.UnqualComponentName (UnqualComponentName, unUnqualComponentName)
 import Distribution.Verbosity (deafening)
 import System.Directory
   ( doesDirectoryExist,
@@ -42,7 +43,8 @@ import Text.Regex.TDFA ((=~))
 data ComputedComponent = ComputedComponent
   { componentName :: String,
     componentDependencies :: [String],
-    componentReverseDependencies :: [String]
+    componentReverseDependencies :: [String],
+    componentType :: String
   }
   deriving (Show)
 
@@ -108,15 +110,16 @@ computeComponentDeps = dispatcher
       LSubLibName ucn -> ucn
 
     dispatcher :: Component -> ComputedComponent
-    dispatcher (CLib lib) = wrap lib retrieveLibName libBuildInfo
-    dispatcher (CExe exe) = wrap exe exeName buildInfo
-    dispatcher (CTest ts) = wrap ts testName testBuildInfo
-    dispatcher (CBench bk) = wrap bk benchmarkName benchmarkBuildInfo
-    dispatcher (CFLib lib) = wrap lib foreignLibName foreignLibBuildInfo
+    dispatcher (CLib lib) = wrap "lib" lib retrieveLibName libBuildInfo
+    dispatcher (CExe exe) = wrap "exe" exe exeName buildInfo
+    dispatcher (CTest ts) = wrap "test" ts testName testBuildInfo
+    dispatcher (CBench bk) = wrap "benchmark" bk benchmarkName benchmarkBuildInfo
+    dispatcher (CFLib lib) = wrap "flib" lib foreignLibName foreignLibBuildInfo
 
-    wrap blob nameRetriever dependencyRetriever =
+    wrap ctype blob nameRetriever dependencyRetriever =
       ComputedComponent
         { componentName = unUnqualComponentName (nameRetriever blob),
+          componentType = ctype,
           componentDependencies = map depToString (targetBuildDepends (dependencyRetriever blob)),
           componentReverseDependencies = []
         }
