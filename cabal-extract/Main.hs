@@ -1,31 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use tuple-section" #-}
 
 module Main (main) where
 
 import Data.Aeson
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.List (intercalate)
-import Data.Maybe (fromMaybe)
-import qualified Data.Set as Set
 import qualified Distribution.Compat.NonEmptySet as NES
 import Distribution.PackageDescription
 import Distribution.PackageDescription.Configuration (flattenPackageDescription)
-import Distribution.Pretty (prettyShow)
 import Distribution.Simple.PackageDescription (readGenericPackageDescription)
-import Distribution.Types.Benchmark (Benchmark (..))
-import Distribution.Types.BuildInfo (targetBuildDepends)
 import Distribution.Types.Component (Component (..))
-import Distribution.Types.Dependency (Dependency (..), depLibraries, depPkgName)
-import Distribution.Types.Executable (Executable (..))
-import Distribution.Types.ForeignLib (foreignLibBuildInfo, foreignLibName)
-import Distribution.Types.GenericPackageDescription (GenericPackageDescription (..))
-import Distribution.Types.Library (Library (..))
-import Distribution.Types.LibraryName (LibraryName (..))
-import Distribution.Types.PackageDescription (PackageDescription (..))
-import Distribution.Types.PackageId (pkgName, pkgVersion)
-import Distribution.Types.PackageName (unPackageName)
-import Distribution.Types.TestSuite (TestSuite (..))
-import Distribution.Types.UnqualComponentName (UnqualComponentName, unUnqualComponentName)
 import Distribution.Verbosity (deafening)
 import System.Directory
   ( doesDirectoryExist,
@@ -48,33 +35,12 @@ data ComputedComponent = ComputedComponent
   }
   deriving (Show)
 
-data Package = Package
-  { packageName :: String,
-    packageVersion :: String,
-    packageExecutables :: [ComputedComponent],
-    packageLibraries :: [ComputedComponent],
-    packageTests :: [ComputedComponent],
-    packageBenchmarks :: [ComputedComponent]
-  }
-  deriving (Show)
-
 instance ToJSON ComputedComponent where
   toJSON comp =
     object
       [ "name" .= componentName comp,
-        "dependencies" .= componentDependencies comp,
-        "reverseDependencies" .= componentReverseDependencies comp
-      ]
-
-instance ToJSON Package where
-  toJSON pkg =
-    object
-      [ "name" .= packageName pkg,
-        "version" .= packageVersion pkg,
-        "libraries" .= packageLibraries pkg,
-        "executables" .= packageExecutables pkg,
-        "tests" .= packageTests pkg,
-        "benchmarks" .= packageBenchmarks pkg
+        "deps" .= componentDependencies comp,
+        "rev-deps" .= componentReverseDependencies comp
       ]
 
 classify :: String -> String -> FilePath -> IO [FilePath]
@@ -102,8 +68,8 @@ findCabalFiles dir =
 parseCabalFile :: FilePath -> IO GenericPackageDescription
 parseCabalFile = readGenericPackageDescription deafening
 
-computeComponentDeps :: Component -> ComputedComponent
-computeComponentDeps = dispatcher
+computeComponentDeps :: String -> Component -> ComputedComponent
+computeComponentDeps pkg = dispatcher
   where
     retrieveLibName lib = case libName lib of
       LMainLibName -> "library"
@@ -118,135 +84,63 @@ computeComponentDeps = dispatcher
 
     wrap ctype blob nameRetriever dependencyRetriever =
       ComputedComponent
-        { componentName = unUnqualComponentName (nameRetriever blob),
+        { componentName = pkg ++ ":" ++ unUnqualComponentName (nameRetriever blob),
           componentType = ctype,
           componentDependencies = map depToString (targetBuildDepends (dependencyRetriever blob)),
           componentReverseDependencies = []
         }
 
-convertPackage :: PackageDescription -> Package
-convertPackage pd =
-  Package
-    { packageName =
-        unPackageName (pkgName (package pd)),
-      packageVersion =
-        prettyShow (pkgVersion (package pd)),
-      packageLibraries =
-        maybe [] (pure . convToCC . CLib) (library pd)
-          ++ map (convToCC . CLib) (subLibraries pd),
-      packageExecutables = map (convToCC . CExe) (executables pd),
-      packageTests =
-        map (convToCC . CTest) (testSuites pd),
-      packageBenchmarks =
-        map (convToCC . CBench) (benchmarks pd)
-    }
+convertPackageDescToComponents :: PackageDescription -> [ComputedComponent]
+convertPackageDescToComponents pd = map (computeComponentDeps pkg) extractComponents
   where
-    convToCC = computeComponentDeps
+    pkg = unPackageName (pkgName (package pd))
+    extractComponents =
+      maybe [] (pure . CLib) (library pd)
+        ++ map CLib (subLibraries pd)
+        ++ map CExe (executables pd)
+        ++ map CTest (testSuites pd)
+        ++ map CBench (benchmarks pd)
+        ++ map CFLib (foreignLibs pd)
 
 depToString :: Dependency -> String
 depToString dep =
   intercalate "," $
     map fmt (NES.toList (depLibraries dep))
   where
-    pkg = unPackageName (depPkgName dep)
-    fmt LMainLibName = pkg
-    fmt (LSubLibName subname) = pkg ++ ":" ++ unUnqualComponentName subname
+    depPkg = unPackageName (depPkgName dep)
+    fmt LMainLibName = depPkg
+    fmt (LSubLibName subname) = depPkg ++ ":" ++ unUnqualComponentName subname
 
-allComponents :: Package -> [ComputedComponent]
-allComponents p =
-  packageLibraries p
-    ++ packageExecutables p
-    ++ packageTests p
-    ++ packageBenchmarks p
+buildReverseDependencies :: [ComputedComponent] -> [ComputedComponent]
+buildReverseDependencies comps = map addRevDeps comps
+  where
+    deps = concatMap (\comp -> map (\d -> (d, componentName comp)) (componentDependencies comp)) comps
 
-innerComponent :: [Package] -> [String]
-innerComponent =
-  concatMap
-    ( \pkg ->
-        map
-          ( \comp -> case componentName comp of
-              "library" -> packageName pkg
-              name -> packageName pkg ++ ":" ++ name
-          )
-          (allComponents pkg)
-    )
-
-trimComponent :: Set.Set String -> ComputedComponent -> ComputedComponent
-trimComponent allowed comp =
-  comp
-    { componentDependencies =
-        filter
-          (`Set.member` allowed)
-          (componentDependencies comp)
-    }
-
-trim :: Package -> [String] -> Package
-trim pkg comps =
-  let allowed = Set.fromList comps
-      trimC = trimComponent allowed
-   in pkg
-        { packageLibraries = map trimC (packageLibraries pkg),
-          packageExecutables = map trimC (packageExecutables pkg),
-          packageTests = map trimC (packageTests pkg),
-          packageBenchmarks = map trimC (packageBenchmarks pkg)
+    addRevDeps comp =
+      comp
+        { componentReverseDependencies =
+            foldl
+              ( \acc (dep, parent) ->
+                  if dep == componentName comp
+                    then acc ++ [parent]
+                    else acc
+              )
+              []
+              deps
         }
 
-buildReverseDependencies :: [Package] -> [Package]
-buildReverseDependencies pkgs =
-  let compDepMap =
-        foldr
-          ( \pkg acc ->
-              foldr
-                ( \comp acc' ->
-                    let compKey = case componentName comp of
-                          "library" -> packageName pkg
-                          name -> packageName pkg ++ ":" ++ name
-                     in foldr
-                          ( \dep acc'' ->
-                              let depKey = dep
-                               in if depKey `elem` map fst acc''
-                                    then
-                                      map
-                                        ( \entry ->
-                                            if fst entry == depKey
-                                              then (fst entry, snd entry ++ [compKey])
-                                              else entry
-                                        )
-                                        acc''
-                                    else (depKey, [compKey]) : acc''
-                          )
-                          acc'
-                          (componentDependencies comp)
-                )
-                acc
-                (allComponents pkg)
-          )
-          []
-          pkgs
-      compDepMapLookup key = fromMaybe [] (lookup key compDepMap)
-      addReverseDeps pkg =
-        let addRevDepToComp comp =
-              comp
-                { componentReverseDependencies =
-                    compDepMapLookup $
-                      case componentName comp of
-                        "library" -> packageName pkg
-                        name -> packageName pkg ++ ":" ++ name
-                }
-         in pkg
-              { packageLibraries = map addRevDepToComp (packageLibraries pkg),
-                packageExecutables = map addRevDepToComp (packageExecutables pkg),
-                packageTests = map addRevDepToComp (packageTests pkg),
-                packageBenchmarks = map addRevDepToComp (packageBenchmarks pkg)
-              }
-   in map addReverseDeps pkgs
+removeExternalDeps :: [ComputedComponent] -> [ComputedComponent]
+removeExternalDeps = map removeExt
+  where
+    removeExt comp =
+      comp
+        { componentDependencies = filter (':' `elem`) (componentDependencies comp)
+        }
 
 main :: IO ()
 main =
   getCurrentDirectory >>= findCabalFiles >>= \cabalFiles -> do
     gpds <- mapM parseCabalFile cabalFiles
     let fpds = map flattenPackageDescription gpds
-        pkgs = map convertPackage fpds
-        trimmedPkgs = map (`trim` innerComponent pkgs) pkgs
-        finalPkgs = buildReverseDependencies trimmedPkgs
-    BL.putStrLn (encode finalPkgs)
+        cc = concatMap convertPackageDescToComponents fpds
+    BL.putStrLn (encode (removeExternalDeps (buildReverseDependencies cc)))
