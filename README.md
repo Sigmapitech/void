@@ -68,12 +68,6 @@ sudo dnf install -y ghc cabal-install make
 cabal update
 ```
 
-**On macOS:**
-```shell
-brew install ghc cabal-install
-cabal update
-```
-
 **On Arch Linux:**
 ```shell
 sudo pacman -S ghc cabal-install make
