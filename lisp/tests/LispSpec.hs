@@ -1,13 +1,20 @@
 module Main (main) where
 
-import Test.Hspec
-
-dummySpec :: Spec
-dummySpec = do
-  describe "dummy test" $ do
-    it "Should always pass" $ do
-      True `shouldBe` True
+import ComplexExamplesSpec (spec)
+import EvaluatorSpec (spec)
+import IntegrationSpec (spec)
+import LispAstSpec (astModuleSpec)
+import LispBootstrapSpec (bootstrapModuleSpec)
+import SexprtoASTSpec (spec)
+import SpecParser (parserSpec)
+import Test.Hspec (hspec)
 
 main :: IO ()
 main = hspec $ do
-  dummySpec
+  parserSpec
+  bootstrapModuleSpec
+  astModuleSpec
+  EvaluatorSpec.spec
+  ComplexExamplesSpec.spec
+  SexprtoASTSpec.spec
+  IntegrationSpec.spec

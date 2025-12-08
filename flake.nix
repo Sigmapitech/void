@@ -83,6 +83,8 @@
               hspec
               hspec-expectations
               megaparsec
+              optparse-applicative
+              parsec
               parsec
               pretty-simple
               regex-tdfa

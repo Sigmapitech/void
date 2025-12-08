@@ -17,35 +17,69 @@ common lang
 common warnings
   ghc-options: -Wall -Wextra -Wredundant-constraints -Wname-shadowing
 
+common extensions
+  default-extensions:
+    GeneralizedNewtypeDeriving
+    OverloadedStrings
+
 common release
   ghc-options: -O2
 
-library lisp-interpreter-lib
+library
   import:          lang
   import:          warnings
-  exposed-modules: Bootstrap
-  hs-source-dirs:  src
-  build-depends:   base
+  import:          extensions
+  exposed-modules:
+    Ast
+    Bootstrap
+    Evaluator
+    Lisp
+    Parser
+    SexprtoAST
+
+  build-depends:
+    , base
+    , megaparsec
+    , mtl
+    , optparse-applicative
+    , parser-combinators
+
+  hs-source-dirs:  src src/parsing
 
 executable lisp-interpreter
   import:         lang
   import:         warnings
+  import:         extensions
   import:         release
   main-is:        Main.hs
-  hs-source-dirs: src
+  hs-source-dirs: app
   build-depends:
     , base
-    , lisp:lisp-interpreter-lib
+    , lisp
+    , mtl
+    , optparse-applicative
 
 test-suite lisp-interpreter-test
   import:         lang
   import:         warnings
+  import:         extensions
   type:           exitcode-stdio-1.0
   main-is:        LispSpec.hs
+  other-modules:
+    ComplexExamplesSpec
+    EvaluatorSpec
+    IntegrationSpec
+    LispAstSpec
+    LispBootstrapSpec
+    SexprtoASTSpec
+    SpecParser
+
   hs-source-dirs: tests
   build-depends:
-    , base                       >=4.7 && <5
+    , base                >=4.7 && <5
     , directory
     , hspec
     , hspec-expectations
-    , lisp:lisp-interpreter-lib
+    , lisp
+    , mtl
+    , silently

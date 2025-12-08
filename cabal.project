@@ -4,5 +4,6 @@ packages:
   ast/
   compiler/
   poc/
+  cli/
 
 tests: True
